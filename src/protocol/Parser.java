@@ -35,27 +35,18 @@ public class Parser{
             }
             if(message.contains("-from_name")){
                 int index=words.indexOf("-from_name");
-                String from_name=words.get(index+1);
-                dict.put("-from_name",from_name);
+
+                dict.put("-from_name","true");
             }
             if(message.contains("-to_name")){
                 int index=words.indexOf("-to_name");
-                String to_name=words.get(index+1);
-                dict.put("-to_name",to_name);
+
+                dict.put("-to_name","true");
             }
             if(message.contains("-refresh")){
                 refresh="true";
                 dict.put("-refresh",refresh);
             }
-
-
-
-
-
-
-
-
-
         return dict;
         }
         else if(message.contains("GAS")){

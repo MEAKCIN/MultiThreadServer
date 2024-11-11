@@ -137,4 +137,46 @@ public class RESTfulAPI {
 
 
 
+    public HashMap<String,ArrayList<String>> exchange(HashMap<String,String>message) throws URISyntaxException, IOException {
+
+        String uri_string=message.get("https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="+message.get("-from")+"&to_currency="+message.get("-to")+"&apikey=4XWGHHUU6COAQC1T");
+        URI uri = new URI(uri_string);
+
+        URL url = uri.toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+
+        String inline = "";
+        Scanner scanner = new Scanner(url.openStream());
+        while (scanner.hasNext()) {
+            inline += scanner.nextLine();
+        }
+        //Close the scanner
+        scanner.close();
+        System.out.println(inline);
+        JSONObject jsonObject = new JSONObject(inline);
+
+        HashMap<String,ArrayList<String>> result = new HashMap<>();
+        String from_currency=jsonObject.getString("1. From_Currency Code");
+        String from_currency_name=jsonObject.getString("2. From_Currency Name");
+        String to_currency=jsonObject.getString("3. To_Currency Code");
+        String to_currency_name=jsonObject.getString("4. To_Currency Name");
+        String exchange_Rate=jsonObject.getString("5. Exchange Rate");
+        String last_refresh=jsonObject.getString("6. Last Refresh");
+        ArrayList<String> resultArray=new ArrayList<>();
+        resultArray.add(from_currency_name);
+        resultArray.add(to_currency);
+        resultArray.add(to_currency_name);
+        resultArray.add(exchange_Rate);
+        resultArray.add(last_refresh);
+        result.put(from_currency_name,resultArray);
+        return result;
+
+
+
+    }       //value:to float, from_name:String,to_name:String, last_refresh:String
+
+
+
 }

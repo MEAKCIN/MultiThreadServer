@@ -100,7 +100,7 @@ public class ServerThread extends Thread {
     public boolean validQuery(HashMap<String,String> message){ //this method helps to understand query is correct or not
         //decide exc or gas
         if(message.containsKey("-from")) {//if it includes from it is exchange
-            if((message.get("-from")!=null || message.get("-from_name")!=null) && (message.get("-to")!=null || message.get("-to_name")!=null)){
+            if((message.get("-from")!=null ) && (message.get("-to")!=null)){
                 return true;
 
             }
