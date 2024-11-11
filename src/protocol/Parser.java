@@ -1,13 +1,15 @@
 package protocol;
+//todo Parse the reeuest coming from client and query required informatiıon in api
+//Parse the api response and sent required information
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class Protocol{
+public class Parser{
 
-    public HashMap<String, String> Request(String message){
+    public HashMap<String, String> clientMessageParse(String message){
         List<String> words = List.of(message.split(" "));
 
 

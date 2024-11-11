@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class ConnectionToServer {
@@ -18,17 +19,20 @@ public class ConnectionToServer {
     protected PrintWriter outputStream;
     protected String serverAddress;
     protected int serverPort;
+    private static final int SOCKET_TIMEOUT= 30000;
 
     public ConnectionToServer(String address, int port) {
         this.serverAddress = address;
         this.serverPort = port;
+
     }
 
-    public void connect() throws UnknownHostException, IOException {
+    public void connect() throws  IOException {
         this.socket = new Socket(this.serverAddress, this.serverPort);
         this.inputStream = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
         this.outputStream = new PrintWriter(this.socket.getOutputStream());
         System.out.println("Successfully connected to server at" + String.valueOf(this.socket.getRemoteSocketAddress()));
+
     }
 
     public String sendForAnswer(String message) throws IOException {

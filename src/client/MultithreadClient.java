@@ -17,14 +17,18 @@ public class MultithreadClient {
 
             System.out.println("Enter a message for the echo");
 
-            for(String message = scanner.nextLine(); !message.equals("ALPHA416 QUIT"); message = scanner.nextLine()) {
-                if(message==null){
-                    break;
+            String message=scanner.nextLine();
+            while (!message.equalsIgnoreCase("ALPHA416 QUIT")) {
+                if (message=="Time out"){
+                    connectionToServer.disconnect();
+                    System.out.println("Disconnected cause of Time out");
                 }
-                PrintStream var10000 = System.out;
-                String var10001 = connectionToServer.sendForAnswer(message);
-                var10000.println("Response from server: " + var10001);
+                PrintStream ClientResponse = System.out;
+                String serverResponse = connectionToServer.sendForAnswer(message);
+                ClientResponse.println("Response from server: " + serverResponse);
+                message = scanner.nextLine();
             }
+
 
 
 

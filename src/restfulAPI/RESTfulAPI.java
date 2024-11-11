@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 
@@ -18,6 +20,9 @@ import java.util.Scanner;
 public class RESTfulAPI {
     // erenin api: 4XWGHHUU6COAQC1T
     //benim api :LG69CLBAG4O31J1Z
+
+
+
 
     public static void main(String[] args) throws MalformedURLException, IOException, URISyntaxException {
         // Uncomment the following if you get an exception related to SSL certificate
@@ -42,36 +47,30 @@ public class RESTfulAPI {
 
         }
 		*/
-        URI uri= new URI("https://www.alphavantage.co/query?function=NATURAL_GAS&apikey=4XWGHHUU6COAQC1T&datatype=csv");
+        URI uri= new URI("https://www.alphavantage.co/query?function=NATURAL_GAS&apikey=4XWGHHUU6COAQC1T&interval=monthly");
 
         URL url = uri.toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
-        
-        ArrayList<String> inline = new ArrayList<String>();
-        String line= new String("");
 
+        String inline = "";
         Scanner scanner = new Scanner(url.openStream());
-        while (scanner.hasNextLine()) {
-            String nextLine = scanner.nextLine();
-            inline.add(nextLine);
-            line += nextLine;
-
+        while (scanner.hasNext()) {
+            inline += scanner.nextLine();
         }
         //Close the scanner
         scanner.close();
+        System.out.println(inline);
 
-
-        FileWriter fileWriter = new FileWriter("output1.txt");
-        PrintWriter printWriter = new PrintWriter(fileWriter);
-
-        printWriter.print(inline);
-        printWriter.close();
-
-
-
-
+        JSONArray jsonObject = new JSONArray(inline);
+        for (int i = 0; i < jsonObject.length(); i++)
+        {
+            String id = jsonObject.getJSONObject(i).getString("id");
+            String name = jsonObject.getJSONObject(i).getString("name");
+            System.out.println(id + "\t" + name);
+        }
+        System.out.println("========================================");
     }
 
 }
