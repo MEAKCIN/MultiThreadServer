@@ -26,7 +26,7 @@ public class RESTfulAPI {
 
     public HashMap<String,String> gasData(HashMap<String,String> message) throws URISyntaxException, IOException {
         //Getting Data
-        URI uri = new URI("https://www.alphavantage.co/query?function=NATURAL_GAS&apikey=4XWGHHUU6COAQC1T&interval=daily");
+        URI uri = new URI("https://www.alphavantage.co/query?function=NATURAL_GAS&apikey=O7NK1J4VMTFYGD00&interval=daily");
 
         URL url = uri.toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -138,8 +138,11 @@ public class RESTfulAPI {
 
 
     public HashMap<String,ArrayList<String>> exchange(HashMap<String,String>message) throws URISyntaxException, IOException {
+        //https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=TRY&apikey=YOUR_API_KEY
+        //"https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="+message.get("-from")+"&to_currency="+message.get("-to")+"&apikey=4XWGHHUU6COAQC1T";
+        //
 
-        String uri_string=message.get("https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="+message.get("-from")+"&to_currency="+message.get("-to")+"&apikey=4XWGHHUU6COAQC1T");
+        String uri_string="https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=TRY&apikey=YOUR_API_KEY";
         URI uri = new URI(uri_string);
 
         URL url = uri.toURL();
@@ -156,21 +159,22 @@ public class RESTfulAPI {
         scanner.close();
         System.out.println(inline);
         JSONObject jsonObject = new JSONObject(inline);
+        JSONObject exchangeObject= jsonObject.getJSONObject("Realtime Currency Exchange Rate");
 
         HashMap<String,ArrayList<String>> result = new HashMap<>();
-        String from_currency=jsonObject.getString("1. From_Currency Code");
-        String from_currency_name=jsonObject.getString("2. From_Currency Name");
-        String to_currency=jsonObject.getString("3. To_Currency Code");
-        String to_currency_name=jsonObject.getString("4. To_Currency Name");
-        String exchange_Rate=jsonObject.getString("5. Exchange Rate");
-        String last_refresh=jsonObject.getString("6. Last Refresh");
+        String from_currency=exchangeObject.getString("1. From_Currency Code");
+        String from_currency_name=exchangeObject.getString("2. From_Currency Name");
+        String to_currency=exchangeObject.getString("3. To_Currency Code");
+        String to_currency_name=exchangeObject.getString("4. To_Currency Name");
+        String exchange_Rate=exchangeObject.getString("5. Exchange Rate");
+        String last_refresh=exchangeObject.getString("6. Last Refresh");
         ArrayList<String> resultArray=new ArrayList<>();
         resultArray.add(from_currency_name);
         resultArray.add(to_currency);
         resultArray.add(to_currency_name);
         resultArray.add(exchange_Rate);
         resultArray.add(last_refresh);
-        result.put(from_currency_name,resultArray);
+        result.put(from_currency,resultArray);
         return result;
 
 

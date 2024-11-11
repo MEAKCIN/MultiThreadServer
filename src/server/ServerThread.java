@@ -1,6 +1,7 @@
 package server;
 
 import protocol.Parser;
+import restfulAPI.RESTfulAPI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ServerThread extends Thread {
@@ -17,7 +20,7 @@ public class ServerThread extends Thread {
     protected Socket socket;
     private String line = new String();
     private String lines = new String();
-    private static final int SOCKET_TIMEOUT= 30000;
+    private static final int SOCKET_TIMEOUT= 100000;
     public ServerThread(Socket socket) {
         this.socket = socket;
         try{
@@ -46,6 +49,24 @@ public class ServerThread extends Thread {
                     this.lines = "Client messaged : " + clientMessage + " at  : " + Thread.currentThread().getId();
                     this.outputStream.println(this.lines);
                     this.outputStream.flush();
+                    if(clientMessage.contains("GAS")){
+                        RESTfulAPI restfulAPI = new RESTfulAPI();
+                        try {
+                            HashMap<String,String> result= restfulAPI.gasData(parsed_message);
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
+
+
+                    }
+                    else if (clientMessage.contains("EXC")){
+                        RESTfulAPI restfulAPI = new RESTfulAPI();
+                        HashMap<String, ArrayList<String>> result=restfulAPI.exchange(parsed_message);
+                        System.out.println("done");
+
+                    }
+
+
 
                     PrintStream server_terminal_out = System.out;
                     String adress_string = String.valueOf(this.socket.getRemoteSocketAddress());
@@ -69,7 +90,7 @@ public class ServerThread extends Thread {
         } catch (IOException var12) {
             this.line = this.getName();
             System.err.println("Server Thread. Run. IO Error/ Client " + this.line + " terminated abruptly");
-        } catch (NullPointerException var13) {
+        } catch (NullPointerException | URISyntaxException var13) {
             this.line = this.getName();
             System.err.println("Server Thread. Run.Client " + this.line + " Closed");
         } finally {
