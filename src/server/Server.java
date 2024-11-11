@@ -31,8 +31,8 @@ public class Server {
         try {
             Socket socket = this.serverSocket.accept();
             System.out.println("A connection was established with a client on the address of " + String.valueOf(socket.getRemoteSocketAddress()));
-            ServerThread st = new ServerThread(socket);
-            st.start();
+            ServerThread serverThread = new ServerThread(socket);
+            serverThread.start();
         } catch (Exception var3) {
             Exception e = var3;
             e.printStackTrace();

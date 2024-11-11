@@ -14,13 +14,20 @@ public class MultithreadClient {
 
         try {
             connectionToServer.connect();
+
             System.out.println("Enter a message for the echo");
 
-            for(String message = scanner.nextLine(); !message.equals("QUIT"); message = scanner.nextLine()) {
+            for(String message = scanner.nextLine(); !message.equals("ALPHA416 QUIT"); message = scanner.nextLine()) {
+                if(message==null){
+                    break;
+                }
                 PrintStream var10000 = System.out;
                 String var10001 = connectionToServer.sendForAnswer(message);
                 var10000.println("Response from server: " + var10001);
             }
+
+
+
         } catch (IOException var12) {
             IOException e = var12;
             System.err.println(e.getMessage());

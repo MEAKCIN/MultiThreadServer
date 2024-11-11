@@ -14,8 +14,8 @@ public class ServerThread extends Thread {
     private String line = new String();
     private String lines = new String();
 
-    public ServerThread(Socket s) {
-        this.socket = s;
+    public ServerThread(Socket socket) {
+        this.socket = socket;
     }
 
     public void run() {
@@ -23,7 +23,12 @@ public class ServerThread extends Thread {
             this.inputStream = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.outputStream = new PrintWriter(this.socket.getOutputStream());
 
-            for(this.line = this.inputStream.readLine(); this.line.compareTo("QUIT") != 0; this.line = this.inputStream.readLine()) {
+            while((this.line=this.inputStream.readLine())!=null){
+                if (this.line.compareTo("ALPHA416 QUIT")==0){
+                    System.out.println("Client requested to quit");
+                    break;
+
+                }
                 String var10001 = this.line;
                 this.lines = "Client messaged : " + var10001 + " at  : " + Thread.currentThread().getId();
                 this.outputStream.println(this.lines);
@@ -49,6 +54,7 @@ public class ServerThread extends Thread {
                 if (this.outputStream != null) {
                     this.outputStream.close();
                     System.err.println("Socket Out Closed");
+
                 }
 
                 if (this.socket != null) {
