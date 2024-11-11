@@ -135,7 +135,7 @@ public class GasCurrencyGUI {
         int result = JOptionPane.showConfirmDialog(frame, panel, "Select Date", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             String date = ((JSpinner.DateEditor) dateSpinner.getEditor()).getFormat().format(dateSpinner.getValue());
-            String message = "Gas price for date " + date + " is: [Result]";
+            String message = "Gas price for date " + date + " inputStream: [Result]";
             JOptionPane.showMessageDialog(frame, message, "Gas Price Result", JOptionPane.INFORMATION_MESSAGE);
             System.out.println(message);
         }
@@ -175,7 +175,7 @@ public class GasCurrencyGUI {
         if (result == JOptionPane.OK_OPTION) {
             String fromDate = ((JSpinner.DateEditor) fromDateSpinner.getEditor()).getFormat().format(fromDateSpinner.getValue());
             String toDate = ((JSpinner.DateEditor) toDateSpinner.getEditor()).getFormat().format(toDateSpinner.getValue());
-            String message = "Difference in gas prices between " + fromDate + " and " + toDate + " is: [Result]";
+            String message = "Difference in gas prices between " + fromDate + " and " + toDate + " inputStream: [Result]";
             JOptionPane.showMessageDialog(frame, message, "Gas Price Difference", JOptionPane.INFORMATION_MESSAGE);
             System.out.println(message);
         }
@@ -215,7 +215,7 @@ public class GasCurrencyGUI {
         if (result == JOptionPane.OK_OPTION) {
             String fromDate = ((JSpinner.DateEditor) fromDateSpinner.getEditor()).getFormat().format(fromDateSpinner.getValue());
             String toDate = ((JSpinner.DateEditor) toDateSpinner.getEditor()).getFormat().format(toDateSpinner.getValue());
-            String message = "Average gas price between " + fromDate + " and " + toDate + " is: [Result]";
+            String message = "Average gas price between " + fromDate + " and " + toDate + " inputStream: [Result]";
             JOptionPane.showMessageDialog(frame, message, "Average Gas Price", JOptionPane.INFORMATION_MESSAGE);
             System.out.println(message);
         }

@@ -2,6 +2,8 @@ package server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -9,54 +11,55 @@ public class ServerThread extends Thread {
     protected BufferedReader inputStream;
     protected PrintWriter outputStream;
     protected Socket socket;
-    private String line=new String();
-    private String lines=new String();
+    private String line = new String();
+    private String lines = new String();
 
-    public ServerThread(Socket socket){
-        this.socket=socket;
+    public ServerThread(Socket s) {
+        this.socket = s;
     }
 
-
-    public void start(){
+    public void run() {
         try {
-            inputStream = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
-            outputStream = new PrintWriter(socket.getOutputStream(), true);
-            line=inputStream.readLine();
-            while(line.compareTo("QUIT")!=0){
-                lines= "Client messaged : " + line + " at : "+ Thread.currentThread().getId();
-                outputStream.println(lines);
-                outputStream.flush();
-                System.out.println("Client "+ socket.getRemoteSocketAddress());
+            this.inputStream = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            this.outputStream = new PrintWriter(this.socket.getOutputStream());
 
-                line=inputStream.readLine();
+            for(this.line = this.inputStream.readLine(); this.line.compareTo("QUIT") != 0; this.line = this.inputStream.readLine()) {
+                String var10001 = this.line;
+                this.lines = "Client messaged : " + var10001 + " at  : " + Thread.currentThread().getId();
+                this.outputStream.println(this.lines);
+                this.outputStream.flush();
+                PrintStream var10000 = System.out;
+                var10001 = String.valueOf(this.socket.getRemoteSocketAddress());
+                var10000.println("Client " + var10001 + " sent :  " + this.lines);
             }
-        } catch(NullPointerException e) {
-            line=this.getName();
-            System.err.println("Server Thread. Run.Client "+ line +" closed");
-        } catch (Exception e) {
-            line =this.getName();
-            System.out.println("Error starting thread: " + e.getMessage());
-        } finally{
+        } catch (IOException var12) {
+            this.line = this.getName();
+            System.err.println("Server Thread. Run. IO Error/ Client " + this.line + " terminated abruptly");
+        } catch (NullPointerException var13) {
+            this.line = this.getName();
+            System.err.println("Server Thread. Run.Client " + this.line + " Closed");
+        } finally {
             try {
-                System.out.println("Closing Connection");
-                if(inputStream!= null){
-                    inputStream.close();
-                    System.err.println("Socket input stream closed");
-                }
-                if(outputStream!= null){
-                    outputStream.close();
-                    System.err.println("Socket output stream closed");
-                }
-                if(socket!= null){
-                    socket.close();
-                    System.err.println("Socket closed");
+                System.out.println("Closing the connection");
+                if (this.inputStream != null) {
+                    this.inputStream.close();
+                    System.err.println(" Socket Input Stream Closed");
                 }
 
-            }catch (IOException ie) {
-                System.err.println("Socket close error");
+                if (this.outputStream != null) {
+                    this.outputStream.close();
+                    System.err.println("Socket Out Closed");
+                }
+
+                if (this.socket != null) {
+                    this.socket.close();
+                    System.err.println("Socket Closed");
+                }
+            } catch (IOException var11) {
+                System.err.println("Socket Close Error");
             }
+
         }
+
     }
-
-
 }

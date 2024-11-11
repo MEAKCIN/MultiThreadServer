@@ -1,68 +1,43 @@
-package server;
-
-import client.ConnectiontoServer;
-import client.MultithreadClient;
+package server;//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
 
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-
-public class Server
-{
+public class Server {
     private ServerSocket serverSocket;
-    public static final int DEFAULT_SERVER_PORT = 8080;
-    private ExecutorService threadPool;
+    public static final int DEFAULT_SERVER_PORT = 4444;
 
-
-    /**
-     * Initiates a server socket on the input port, listens to the line, on receiving an incoming
-     * connection creates and starts a ServerThread on the client
-     * @param port
-     */
-    public Server(int port)
-    {
-        this.threadPool = Executors.newCachedThreadPool();
-        try
-        {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Oppened up a server socket on " + Inet4Address.getLocalHost());
-            threadPool.submit(()-> new ConnectiontoServer(ConnectiontoServer.Default_Server_Adress,ConnectiontoServer.Default_Server_Port));
-        }
-        catch (IOException e)
-        {
+    public Server(int port) {
+        try {
+            this.serverSocket = new ServerSocket(port);
+            System.out.println("Oppened up a server socket on " + String.valueOf(Inet4Address.getLocalHost()));
+        } catch (IOException var3) {
+            IOException e = var3;
             e.printStackTrace();
             System.err.println("Server class.Constructor exception on oppening a server socket");
         }
-        while (true)
-        {
-            listenAndAccept();
+
+        while(true) {
+            this.listenAndAccept();
         }
     }
 
-    /**
-     * Listens to the line and starts a connection on receiving a request from the client
-     * The connection is started and initiated as a ServerThread object
-     */
-    private void listenAndAccept()
-    {
-        Socket socket;
-        try
-        {
-            socket = serverSocket.accept();
-            System.out.println("A connection was established with a client on the address of " + socket.getRemoteSocketAddress());
-            ServerThread serverThread = new ServerThread(socket);
-            serverThread.start();
-        }
-        catch (Exception e)
-        {
+    private void listenAndAccept() {
+        try {
+            Socket socket = this.serverSocket.accept();
+            System.out.println("A connection was established with a client on the address of " + String.valueOf(socket.getRemoteSocketAddress()));
+            ServerThread st = new ServerThread(socket);
+            st.start();
+        } catch (Exception var3) {
+            Exception e = var3;
             e.printStackTrace();
             System.err.println("Server Class. Connection establishment error inside listen and accept function");
         }
+
     }
-
 }
-

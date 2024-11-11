@@ -1,36 +1,39 @@
-package client;
-//todo write client using ConnectiontoServer and connect to Server
-//todo check input of user if there is a
+package client;//
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Scanner;
 
-public class MultithreadClient
-{
-    public static void main(String[] args){
-        ConnectiontoServer connectiontoServer=new ConnectiontoServer(ConnectiontoServer.Default_Server_Adress,ConnectiontoServer.Default_Server_Port);
-        Scanner scanner=new Scanner(System.in);
-        try{
-            connectiontoServer.connect();
-            System.out.println("Server Client connection Completed\n Welcome to Client");
-            System.out.println("Enter a message for sending Server");
-            String message=scanner.nextLine();
-            while(!message.equals("ALPHA416 QUIT")){
-                System.out.println("Response from Server: "+ connectiontoServer.sendForAnswers(message));
-                message=scanner.nextLine();
+public class MultithreadClient {
+    public MultithreadClient() {
+    }
+
+    public static void main(String[] args) {
+        ConnectionToServer connectionToServer = new ConnectionToServer("localhost", 4444);
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            connectionToServer.connect();
+            System.out.println("Enter a message for the echo");
+
+            for(String message = scanner.nextLine(); !message.equals("QUIT"); message = scanner.nextLine()) {
+                PrintStream var10000 = System.out;
+                String var10001 = connectionToServer.sendForAnswer(message);
+                var10000.println("Response from server: " + var10001);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException var12) {
+            IOException e = var12;
+            System.err.println(e.getMessage());
         } finally {
-            try{
-                connectiontoServer.disconnect();
+            try {
+                connectionToServer.disconnect();
                 scanner.close();
-            } catch (IOException e ){
+            } catch (IOException var11) {
+                IOException e = var11;
                 System.err.println(e.getMessage());
             }
+
         }
-
-
 
     }
 }
