@@ -35,12 +35,19 @@ public class ConnectionToServer {
 
     }
 
-    public String sendForAnswer(String message) throws IOException {
+    public void sendForAnswer(String message) throws IOException {
         new String();
         this.outputStream.println(message);
         this.outputStream.flush();
-        String response = this.inputStream.readLine();
-        return response;
+
+    }
+    public String getForAnswer() throws IOException {
+       String response=this.inputStream.readLine();
+       do{
+           return response;
+
+
+       }while(response!=null);
     }
 
     public void disconnect() throws IOException {

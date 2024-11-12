@@ -24,8 +24,14 @@ public class MultithreadClient {
                     System.out.println("Disconnected cause of Time out");
                 }
                 PrintStream ClientResponse = System.out;
-                String serverResponse = connectionToServer.sendForAnswer(message);
-                ClientResponse.printf("Response from server: " + serverResponse);
+                connectionToServer.sendForAnswer(message);
+                String serverResponse=new String("");
+
+                while(serverResponse!=null){
+                    serverResponse= connectionToServer.getForAnswer();
+                    ClientResponse.printf("Response from server: " + serverResponse+"\n");
+                }
+
                 message = scanner.nextLine();
             }
 

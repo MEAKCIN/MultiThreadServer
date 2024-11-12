@@ -71,7 +71,7 @@ public class ServerThread extends Thread {
 
                     }
 
-                    this.outputStream.printf(response);
+                    this.outputStream.println(response);
                     this.outputStream.flush();
 
 
