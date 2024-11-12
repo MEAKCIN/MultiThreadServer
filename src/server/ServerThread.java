@@ -1,6 +1,8 @@
 package server;
 
-import protocol.Parser;
+import protocol.ClientParser;
+
+import protocol.RespondParser;
 import restfulAPI.RESTfulAPI;
 
 import java.io.BufferedReader;
@@ -35,16 +37,19 @@ public class ServerThread extends Thread {
             this.inputStream = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.outputStream = new PrintWriter(this.socket.getOutputStream());
 
-            while((this.line=this.inputStream.readLine())!=null){
+            while((this.line=this.inputStream.readLine())!=null){//if quit it exits from server
                 if (this.line.compareTo("ALPHA416 QUIT")==0){
-                    System.out.println("Client requested to quit");
+                    System.out.println("Alpha416 ALPHA_200 Success\nClient requested to quit");
                     break;
-
                 }
+
+
                 String clientMessage = this.line;
-                Parser parser= new Parser();
+                ClientParser parser= new ClientParser();
                 HashMap<String,String> parsed_message= parser.clientMessageParse(clientMessage);
                 boolean validquery=validQuery(parsed_message);
+                RespondParser respond= new RespondParser();
+                String response=new String();
                 if (validquery){
                     this.lines = "Client messaged : " + clientMessage + " at  : " + Thread.currentThread().getId();
                     this.outputStream.println(this.lines);
@@ -52,7 +57,7 @@ public class ServerThread extends Thread {
                     if(clientMessage.contains("GAS")){
                         RESTfulAPI restfulAPI = new RESTfulAPI();
                         try {
-                            HashMap<String,String> result= restfulAPI.gasData(parsed_message);
+                            response= restfulAPI.gasData(parsed_message);
                         } catch (URISyntaxException e) {
                             throw new RuntimeException(e);
                         }
@@ -61,7 +66,7 @@ public class ServerThread extends Thread {
                     }
                     else if (clientMessage.contains("EXC")){
                         RESTfulAPI restfulAPI = new RESTfulAPI();
-                        HashMap<String, ArrayList<String>> result=restfulAPI.exchange(parsed_message);
+                        response= restfulAPI.exchange(parsed_message);
                         System.out.println("done");
 
                     }
@@ -74,9 +79,9 @@ public class ServerThread extends Thread {
 
                 }
                 else {
-                    String invalidRequest="Alpha416 ALPHA_400 Invalid Request\nError:Invalid parameter";
-                    this.lines=invalidRequest;
-                    this.outputStream.printf(invalidRequest);
+                    response=respond.exchangeInvalidRequest();
+                    this.lines=response;
+                    this.outputStream.printf(response);
                     this.outputStream.flush();
                     System.out.println("Client "+String.valueOf(this.socket.getRemoteSocketAddress())+" sent :  " + this.lines);
                 }

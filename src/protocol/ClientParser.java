@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class Parser{
+public class ClientParser{
 
     public HashMap<String, String> clientMessageParse(String message){
         List<String> words = List.of(message.split(" "));

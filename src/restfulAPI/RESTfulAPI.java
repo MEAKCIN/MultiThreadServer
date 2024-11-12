@@ -15,8 +15,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-
+import protocol.RespondParser;
 
 
 public class RESTfulAPI {
@@ -24,54 +23,73 @@ public class RESTfulAPI {
     //benim api :LG69CLBAG4O31J1Z
 
 
-    public HashMap<String,String> gasData(HashMap<String,String> message) throws URISyntaxException, IOException {
+    public String gasData(HashMap<String,String> message) throws URISyntaxException, IOException {
         //Getting Data
         URI uri = new URI("https://www.alphavantage.co/query?function=NATURAL_GAS&apikey=O7NK1J4VMTFYGD00&interval=daily");
+
+        String response = new String("");
+        RespondParser respond = new RespondParser();
 
         URL url = uri.toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
+        try {
+            String inline = "";
+            Scanner scanner = new Scanner(url.openStream());
+            while (scanner.hasNext()) {
+                inline += scanner.nextLine();
+            }
 
-        String inline = "";
-        Scanner scanner = new Scanner(url.openStream());
-        while (scanner.hasNext()) {
-            inline += scanner.nextLine();
+            //Close the scanner
+            scanner.close();
+            System.out.println(inline);
+
+
+            try {
+                JSONObject jsonObject = new JSONObject(inline);
+                JSONArray jsonArray = jsonObject.getJSONArray("data");
+                HashMap<LocalDate, String> data = new HashMap<LocalDate, String>();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject dataPoint = jsonArray.getJSONObject(i);
+
+                    String dateString = dataPoint.getString("date");
+                    LocalDate date = LocalDate.parse(dateString, formatter);
+                    String value = dataPoint.getString("value");
+                    data.put(date, value);
+
+                }
+                System.out.println(data);
+                //I get the data now I am getting specific data
+                HashMap<String, String> result = new HashMap<>();
+                if (message.get("change_date") == null && message.get("average_date") == null) {
+                    result = specificGasPrice(data, message);
+
+                } else if (message.get("change_date") != null && message.get("average_date") == null) {
+                    result = changeInGasPrices(data, message);//first date is the key and value shows it is increase or decrease
+
+                } else if (message.get("change_date") == null && message.get("average_date") != null) {
+                    result = averageGasPrice(data, message);
+
+                }
+
+                response = respond.gasPriceSuccess(result, message);
+                return response;
+            } catch (NullPointerException e) {
+                response = respond.gasNotFound();
+            } finally {
+                return response;
+            }
+        } catch (NullPointerException e) {
+            response=respond.serverError();
+        }finally {
+            return response;
         }
-        //Close the scanner
-        scanner.close();
-        System.out.println(inline);
-        JSONObject jsonObject = new JSONObject(inline);
-        JSONArray jsonArray = jsonObject.getJSONArray("data");
-        HashMap<LocalDate, String> data = new HashMap<LocalDate, String>();
-        DateTimeFormatter formatter= DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject dataPoint=jsonArray.getJSONObject(i);
-
-            String dateString=dataPoint.getString("date");
-            LocalDate date = LocalDate.parse(dateString,formatter);
-            String value=dataPoint.getString("value");
-            data.put(date,value);
-
-        }
-        System.out.println(data);
-        //I get the data now I am getting specific data
-        HashMap<String,String> result = new HashMap<>();
-        if(message.get("change_date")==null && message.get("average_date")==null){
-            result=specificGasPrice(data,message);
-        } else if (message.get("change_date")!=null && message.get("average_date")==null) {
-            result=changeInGasPrices(data,message);//first date is the key and value shows it is increase or decrease
-
-        }
-        else if(message.get("change_date")==null && message.get("average_date")!=null){
-        return averageGasPrice(data,message);
-
-        }
-
-
-        return result;
     }
 
 
@@ -137,45 +155,70 @@ public class RESTfulAPI {
 
 
 
-    public HashMap<String,ArrayList<String>> exchange(HashMap<String,String>message) throws URISyntaxException, IOException {
+    public String exchange(HashMap<String,String>message) throws URISyntaxException, IOException {
         //https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=TRY&apikey=YOUR_API_KEY
         //"https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="+message.get("-from")+"&to_currency="+message.get("-to")+"&apikey=4XWGHHUU6COAQC1T";
         //
 
-        String uri_string="https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=TRY&apikey=YOUR_API_KEY";
+        String uri_string="https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency="+message.get("-from")+"&to_currency="+message.get("-to")+"&apikey=4XWGHHUU6COAQC1T";
         URI uri = new URI(uri_string);
 
-        URL url = uri.toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
+        RespondParser respondParser=new RespondParser();
+        String response=new String("");
 
-        String inline = "";
-        Scanner scanner = new Scanner(url.openStream());
-        while (scanner.hasNext()) {
-            inline += scanner.nextLine();
+        try {
+            URL url = uri.toURL();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+
+            String inline = "";
+            Scanner scanner = new Scanner(url.openStream());
+            while (scanner.hasNext()) {
+                inline += scanner.nextLine();
+            }
+
+            //Close the scanner
+            scanner.close();
+            System.out.println(inline);
+            JSONObject jsonObject = new JSONObject(inline);
+            JSONObject exchangeObject = jsonObject.getJSONObject("Realtime Currency Exchange Rate");
+
+            HashMap<String, ArrayList<String>> result = new HashMap<>();
+            String from_currency = exchangeObject.getString("1. From_Currency Code");
+            String from_currency_name = exchangeObject.getString("2. From_Currency Name");//index=0
+            String to_currency = exchangeObject.getString("3. To_Currency Code");//index=1
+            String to_currency_name = exchangeObject.getString("4. To_Currency Name");//index=2
+            String exchange_Rate = exchangeObject.getString("5. Exchange Rate");//index=3
+            String last_refresh = exchangeObject.getString("6. Last Refreshed");//index=4
+            ArrayList<String> resultArray = new ArrayList<>();
+
+
+            try {
+                resultArray.add(from_currency_name);
+                resultArray.add(to_currency);
+                resultArray.add(to_currency_name);
+                resultArray.add(exchange_Rate);
+                resultArray.add(last_refresh);
+                result.put(from_currency, resultArray);
+                response = respondParser.exchangeSuccessful(result, message);
+
+
+            } catch (NullPointerException e) {
+                response = respondParser.exchangeNotFound();
+
+            } finally {
+                return response;
+            }
+        }catch (NullPointerException e){
+            response = respondParser.serverError();
         }
-        //Close the scanner
-        scanner.close();
-        System.out.println(inline);
-        JSONObject jsonObject = new JSONObject(inline);
-        JSONObject exchangeObject= jsonObject.getJSONObject("Realtime Currency Exchange Rate");
+        finally {
+            return response;
+        }
 
-        HashMap<String,ArrayList<String>> result = new HashMap<>();
-        String from_currency=exchangeObject.getString("1. From_Currency Code");
-        String from_currency_name=exchangeObject.getString("2. From_Currency Name");
-        String to_currency=exchangeObject.getString("3. To_Currency Code");
-        String to_currency_name=exchangeObject.getString("4. To_Currency Name");
-        String exchange_Rate=exchangeObject.getString("5. Exchange Rate");
-        String last_refresh=exchangeObject.getString("6. Last Refresh");
-        ArrayList<String> resultArray=new ArrayList<>();
-        resultArray.add(from_currency_name);
-        resultArray.add(to_currency);
-        resultArray.add(to_currency_name);
-        resultArray.add(exchange_Rate);
-        resultArray.add(last_refresh);
-        result.put(from_currency,resultArray);
-        return result;
+
+
 
 
 
