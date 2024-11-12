@@ -174,8 +174,13 @@ public class RESTfulAPI {
 
             String inline = "";
             Scanner scanner = new Scanner(url.openStream());
+
             while (scanner.hasNext()) {
                 inline += scanner.nextLine();
+            }
+            if(inline.contains("Thank you for using Alpha Vantage")){
+                response=respondParser.serverError();
+                return response;
             }
 
             //Close the scanner
@@ -202,26 +207,24 @@ public class RESTfulAPI {
                 resultArray.add(last_refresh);
                 result.put(from_currency, resultArray);
                 response = respondParser.exchangeSuccessful(result, message);
+                if (response==null){
+                    response = respondParser.serverError();
+                    return response;
+                }
 
 
             } catch (NullPointerException e) {
                 response = respondParser.exchangeNotFound();
-
-            } finally {
                 return response;
+
             }
-        }catch (NullPointerException e){
+        }catch (NullPointerException e) {
             response = respondParser.serverError();
-        }
-        finally {
             return response;
         }
 
 
-
-
-
-
+        return response;
     }       //value:to float, from_name:String,to_name:String, last_refresh:String
 
 

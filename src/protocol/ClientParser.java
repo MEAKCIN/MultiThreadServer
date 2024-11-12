@@ -34,12 +34,12 @@ public class ClientParser{
                 dict.put("-to",to_currency);
             }
             if(message.contains("-from_name")){
-                int index=words.indexOf("-from_name");
+
 
                 dict.put("-from_name","true");
             }
             if(message.contains("-to_name")){
-                int index=words.indexOf("-to_name");
+
 
                 dict.put("-to_name","true");
             }
