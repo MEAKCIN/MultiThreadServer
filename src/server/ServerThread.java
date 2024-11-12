@@ -22,7 +22,7 @@ public class ServerThread extends Thread {
     protected Socket socket;
     private String line = new String();
     private String lines = new String();
-    private static final int SOCKET_TIMEOUT= 100000;
+    private static final int SOCKET_TIMEOUT= 30000;
     public ServerThread(Socket socket) {
         this.socket = socket;
         try{
