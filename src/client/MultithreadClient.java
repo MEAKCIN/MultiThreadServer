@@ -25,7 +25,7 @@ public class MultithreadClient {
                 }
                 PrintStream ClientResponse = System.out;
                 String serverResponse = connectionToServer.sendForAnswer(message);
-                ClientResponse.println("Response from server: " + serverResponse);
+                ClientResponse.printf("Response from server: " + serverResponse);
                 message = scanner.nextLine();
             }
 
